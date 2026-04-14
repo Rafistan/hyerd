@@ -16,7 +16,7 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: ['http://localhost:4200'],
+    origin: ['http://localhost:4200', 'https://Rafistan.github.io'],
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -24,7 +24,7 @@ async function bootstrap() {
 
   const port = process.env.PORT ?? 3200;
   await app.listen(port);
-  console.log(`Hyerd backend running on http://localhost:${port}/api/v1`);
+  console.log(`Hyerd backend running on http://localhost:${ port }/api/v1`);
 }
 
 bootstrap();
