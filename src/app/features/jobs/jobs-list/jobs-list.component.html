@@ -1,0 +1,144 @@
+<div class="jobs-page">
+
+  <!-- Page Header -->
+  <div class="jobs-hero">
+    <div class="jobs-hero__inner">
+      <span class="section-eyebrow">Career Opportunities</span>
+      <h1 class="jobs-hero__title">Find Your Next<br/>Opportunity</h1>
+      <p class="jobs-hero__sub">Discover meaningful work within the Armenian community worldwide.</p>
+    </div>
+  </div>
+
+  <div class="jobs-container">
+
+    <!-- Search Bar -->
+    <div class="search-card">
+      <div class="search-field">
+        <i class="bi bi-search search-icon"></i>
+        <input
+          type="text"
+          [(ngModel)]="searchKeyword"
+          (ngModelChange)="onFilterChange()"
+          placeholder="Job title, skills, company…"
+          class="search-input"
+        />
+      </div>
+      <div class="search-divider"></div>
+      <div class="search-field">
+        <i class="bi bi-geo-alt search-icon"></i>
+        <input
+          type="text"
+          [(ngModel)]="searchLocation"
+          (ngModelChange)="onFilterChange()"
+          placeholder="City, region, remote…"
+          class="search-input"
+        />
+      </div>
+      <div class="search-divider"></div>
+      <div class="search-field search-select-field">
+        <i class="bi bi-briefcase search-icon"></i>
+        <select [(ngModel)]="selectedJobType" (ngModelChange)="onFilterChange()" class="search-select">
+          <option value="">All Job Types</option>
+          <option value="Full-time">Full-time</option>
+          <option value="Part-time">Part-time</option>
+          <option value="Contract">Contract</option>
+          <option value="Remote">Remote</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Filter Tags -->
+    <div class="filter-tags">
+      @for (tag of filterTags; track tag) {
+        <button
+          class="filter-tag"
+          [class.active]="selectedFilter() === tag"
+          (click)="setFilter(tag)"
+        >{{ tag }}</button>
+      }
+    </div>
+
+    <!-- Results Header -->
+    <div class="results-header">
+          <span class="results-count">
+            <strong>{{ filteredJobs().length }}</strong> positions found
+          </span>
+    </div>
+
+    <!-- Jobs List -->
+    <div class="jobs-list">
+      @if (paginatedJobs().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon"><i class="bi bi-briefcase"></i></div>
+          <h3 class="empty-heading">No positions found</h3>
+          <p class="empty-text">Try adjusting your search or filters to find more opportunities.</p>
+        </div>
+      }
+
+      @for (job of paginatedJobs(); track job.id) {
+        <div class="job-card">
+          <div class="job-card__logo" [style.background]="job.logoGradient">
+            {{ job.logoInitial }}
+          </div>
+
+          <div class="job-card__body">
+            <div class="job-card__top">
+              <div>
+                <h3 class="job-title">{{ job.title }}</h3>
+                <p class="job-company">{{ job.company }}</p>
+              </div>
+              <span class="job-salary">{{ job.salary }}</span>
+            </div>
+
+            <div class="job-meta">
+                  <span class="meta-item">
+                    <i class="bi bi-geo-alt"></i> {{ job.location }}
+                  </span>
+              <span class="meta-item">
+                    <i class="bi bi-clock"></i> {{ job.postedDaysAgo }}d ago
+                  </span>
+              <span class="job-type-pill type-{{ job.type.toLowerCase().replace('-', '') }}">
+                    {{ job.type }}
+                  </span>
+            </div>
+
+            <p class="job-description">{{ job.description }}</p>
+
+            <div class="job-footer">
+              <div class="job-tags">
+                @for (tag of job.tags; track tag) {
+                  <span class="job-tag">{{ tag }}</span>
+                }
+              </div>
+              <a [routerLink]="['/jobs', job.id]" class="btn-hy btn-hy-primary btn-hy-sm">
+                View & Apply <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button
+          class="btn-hy btn-hy-outline btn-hy-sm"
+          [disabled]="currentPage() === 1"
+          (click)="previousPage()"
+        >
+          <i class="bi bi-chevron-left"></i> Previous
+        </button>
+        <span class="pagination-info">Page {{ currentPage() }} of {{ totalPages() }}</span>
+        <button
+          class="btn-hy btn-hy-outline btn-hy-sm"
+          [disabled]="currentPage() === totalPages()"
+          (click)="nextPage()"
+        >
+          Next <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    }
+
+  </div>
+</div>

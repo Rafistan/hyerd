@@ -1,0 +1,215 @@
+<div class="dir-page">
+  <!-- Page Header -->
+  <div class="dir-hero">
+    <div class="dir-hero__inner">
+      <span class="section-eyebrow">Explore</span>
+      <h1 class="dir-hero__title">Business<br/>Directory</h1>
+      <p class="dir-hero__sub">Discover Armenian-owned businesses and services across your community.</p>
+      <div class="dir-hero__search">
+        <i class="bi bi-search"></i>
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search businesses, categories…"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="container dir-layout">
+    <!-- Sidebar -->
+    <aside class="dir-sidebar" [class.open]="sidebarOpen()">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Filters</span>
+        <button class="sidebar-close btn btn-ghost d-lg-none" (click)="sidebarOpen.set(false)">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <!-- Categories -->
+      <div class="filter-group">
+        <div class="filter-group__label">Category</div>
+        @for (cat of categories; track cat) {
+          <label class="filter-check">
+            <input type="checkbox" [value]="cat"
+                   [checked]="selectedCategories().includes(cat)"
+                   (change)="toggleCategory(cat)"/>
+            <span class="filter-check__box"></span>
+            <span class="filter-check__label">{{ cat }}</span>
+          </label>
+        }
+      </div>
+
+      <!-- Rating -->
+      <div class="filter-group">
+        <div class="filter-group__label">Minimum Rating</div>
+        @for (r of [4, 3, 2, 1]; track r) {
+          <label class="filter-check">
+            <input type="radio" name="rating" [value]="r"
+                   [checked]="minRating() === r"
+                   (change)="minRating.set(r)"/>
+            <span class="filter-check__box filter-check__box--radio"></span>
+            <span class="filter-check__label">
+                  <span class="stars-sm">{{ '★'.repeat(r) }}{{ '☆'.repeat(5 - r) }}</span>
+                  &amp; up
+                </span>
+          </label>
+        }
+      </div>
+
+      <!-- Verified Only -->
+      <div class="filter-group">
+        <div class="filter-group__label">Trust</div>
+        <label class="filter-toggle">
+          <input type="checkbox" [(ngModel)]="verifiedOnlyModel" (change)="verifiedOnly.set(verifiedOnlyModel)"/>
+          <span class="filter-toggle__track"></span>
+          <span class="filter-toggle__label">Verified only</span>
+        </label>
+      </div>
+
+      <button class="btn btn-hy-outline w-100 mt-2" (click)="clearFilters()">
+        <i class="bi bi-arrow-counterclockwise me-1"></i>Clear filters
+      </button>
+    </aside>
+
+    <!-- Content -->
+    <div class="dir-content">
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <button class="btn btn-hy-ghost filter-bar__toggle d-lg-none" (click)="sidebarOpen.set(true)">
+          <i class="bi bi-sliders"></i> Filters
+          @if (activeFilterCount() > 0) {
+            <span class="filter-badge">{{ activeFilterCount() }}</span>
+          }
+        </button>
+
+        <!-- Active pills -->
+        <div class="filter-pills">
+          @for (cat of selectedCategories(); track cat) {
+            <span class="filter-pill">
+                  {{ cat }}
+              <button (click)="toggleCategory(cat)"><i class="bi bi-x"></i></button>
+                </span>
+          }
+          @if (minRating() > 0) {
+            <span class="filter-pill">
+                  {{ minRating() }}★ & up
+                  <button (click)="minRating.set(0)"><i class="bi bi-x"></i></button>
+                </span>
+          }
+          @if (verifiedOnly()) {
+            <span class="filter-pill filter-pill--gold">
+                  Verified
+                  <button (click)="verifiedOnly.set(false); verifiedOnlyModel = false"><i class="bi bi-x"></i></button>
+                </span>
+          }
+        </div>
+
+        <div class="filter-bar__right">
+          <span class="results-count">{{ filteredBusinesses().length }} results</span>
+          <select class="sort-select" [(ngModel)]="sortBy">
+            <option value="rating">Top Rated</option>
+            <option value="name">A–Z</option>
+            <option value="reviews">Most Reviewed</option>
+          </select>
+          <div class="view-toggle">
+            <button [class.active]="gridView()" (click)="gridView.set(true)" title="Grid view">
+              <i class="bi bi-grid-3x3-gap"></i>
+            </button>
+            <button [class.active]="!gridView()" (click)="gridView.set(false)" title="List view">
+              <i class="bi bi-list-ul"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid View -->
+      @if (gridView()) {
+        <div class="business-grid">
+          @for (biz of filteredBusinesses(); track biz.id; let i = $index) {
+            <a [routerLink]="['/directory', biz.id]" class="biz-card" [hyAnimate]="'fade-up'" [hyDelay]="i * 60">
+              <div class="biz-card__img" [style.background]="biz.gradient">
+                <span class="biz-card__initials">{{ biz.initials }}</span>
+                @if (biz.verified) {
+                  <span class="biz-card__verified"><i class="bi bi-patch-check-fill"></i></span>
+                }
+                <span class="biz-card__category-pill">{{ biz.category }}</span>
+              </div>
+              <div class="biz-card__body">
+                <h3 class="biz-card__name">{{ biz.name }}</h3>
+                <p class="biz-card__desc">{{ biz.description }}</p>
+                <div class="biz-card__meta">
+                  <span class="biz-meta-loc"><i class="bi bi-geo-alt"></i> {{ biz.location }}</span>
+                </div>
+                <div class="biz-card__footer">
+                  <div class="biz-rating">
+                    <span class="biz-rating__score">{{ biz.rating.toFixed(1) }}</span>
+                    <div class="biz-stars">
+                      @for (s of [1, 2, 3, 4, 5]; track s) {
+                        <i class="bi" [class.bi-star-fill]="s <= biz.rating" [class.bi-star]="s > biz.rating"></i>
+                      }
+                    </div>
+                    <span class="biz-rating__count">({{ biz.reviewCount }})</span>
+                  </div>
+                  <div class="biz-tags">
+                    @for (tag of biz.tags.slice(0, 2); track tag) {
+                      <span class="biz-tag">{{ tag }}</span>
+                    }
+                  </div>
+                </div>
+              </div>
+            </a>
+          }
+        </div>
+      }
+
+      <!-- List View -->
+      @if (!gridView()) {
+        <div class="business-list">
+          @for (biz of filteredBusinesses(); track biz.id; let i = $index) {
+            <a [routerLink]="['/directory', biz.id]" class="biz-row" [hyAnimate]="'fade-up'" [hyDelay]="i * 40">
+              <div class="biz-row__avatar" [style.background]="biz.gradient">
+                <span>{{ biz.initials }}</span>
+              </div>
+              <div class="biz-row__info">
+                <div class="biz-row__top">
+                  <h3 class="biz-row__name">{{ biz.name }}</h3>
+                  @if (biz.verified) {
+                    <span class="verified-badge"><i class="bi bi-patch-check-fill"></i> Verified</span>
+                  }
+                </div>
+                <p class="biz-row__desc">{{ biz.description }}</p>
+                <div class="biz-row__meta">
+                  <span><i class="bi bi-tag"></i> {{ biz.category }}</span>
+                  <span><i class="bi bi-geo-alt"></i> {{ biz.location }}</span>
+                  <span><i class="bi bi-telephone"></i> {{ biz.phone }}</span>
+                </div>
+              </div>
+              <div class="biz-row__right">
+                <div class="biz-rating">
+                  <span class="biz-rating__score">{{ biz.rating.toFixed(1) }}</span>
+                  <div class="biz-stars">
+                    @for (s of [1, 2, 3, 4, 5]; track s) {
+                      <i class="bi" [class.bi-star-fill]="s <= biz.rating" [class.bi-star]="s > biz.rating"></i>
+                    }
+                  </div>
+                  <span class="biz-rating__count">({{ biz.reviewCount }})</span>
+                </div>
+                <span class="biz-row__arrow"><i class="bi bi-arrow-right"></i></span>
+              </div>
+            </a>
+          }
+        </div>
+      }
+
+      <!-- Empty State -->
+      @if (filteredBusinesses().length === 0) {
+        <div class="empty-state">
+          <div class="empty-state__icon">
+            <i class="bi bi-building-slash"></i>
+          </div>
+          <h3 class="empty-state__title">No businesses found</h3>
+          <p class="empty-state__text">Try adjusting your filters or search terms.</p>
+          <button class="btn btn-hy-primary" (click)="clearFilters()">Clear all filters</button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

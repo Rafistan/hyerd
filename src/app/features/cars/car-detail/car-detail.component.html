@@ -1,0 +1,139 @@
+@if (loading()) {
+  <div class="state-screen">
+    <div class="loading-ring"></div>
+    <p class="state-label">Loading vehicle details…</p>
+  </div>
+} @else if (notFound()) {
+  <div class="state-screen">
+    <i class="bi bi-car-front state-icon"></i>
+    <p class="state-label">Vehicle not found.</p>
+    <a routerLink="/cars" class="back-link"><i class="bi bi-arrow-left"></i> Back to Cars</a>
+  </div>
+} @else if (car()) {
+  @if (car(); as c) {
+<div class="detail-page">
+
+  <nav class="detail-crumb">
+    <div class="detail-crumb__inner">
+      <a routerLink="/" class="crumb-link">Home</a>
+      <i class="bi bi-chevron-right crumb-sep"></i>
+      <a routerLink="/cars" class="crumb-link">Cars</a>
+      <i class="bi bi-chevron-right crumb-sep"></i>
+      <span class="crumb-cur">{{ c.year }} {{ c.make }} {{ c.model }}</span>
+    </div>
+  </nav>
+
+  <!-- Hero photo placeholder -->
+  <div class="detail-hero-ph">
+    <i class="bi bi-car-front-fill detail-hero-ph__icon detail-hero-ph__icon--muted"></i>
+    <p class="detail-hero-ph__text">Cover photo</p>
+  </div>
+  <div class="detail-title-bar">
+    <div class="detail-title-bar__inner">
+      <div class="dtb-left">
+        <span class="badge-cond">{{ c.condition }}</span>
+        <h1 class="dtb-title">{{ c.year }} {{ c.make }} {{ c.model }}</h1>
+        <div class="dtb-loc"><i class="bi bi-geo-alt-fill"></i> {{ c.location }}</div>
+      </div>
+      <div class="dtb-right">
+        <span class="dtb-price">{{ formatPrice(c.price) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-layout">
+    <main class="detail-main">
+
+      <!-- Specs -->
+      <section class="d-card">
+        <h2 class="d-heading"><i class="bi bi-speedometer2"></i> Key Specifications</h2>
+        <div class="specs-grid">
+          @for (spec of getSpecs(c); track spec.label) {
+            <div class="spec-card">
+              <i [class]="'bi ' + spec.icon + ' spec-icon'"></i>
+              <div>
+                <span class="spec-lbl">{{ spec.label }}</span>
+                <span class="spec-val">{{ spec.value }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Photos -->
+      <section class="d-card">
+        <h2 class="d-heading"><i class="bi bi-images"></i> Photos</h2>
+        <div class="photo-grid">
+          <div class="photo-slot photo-slot--main"><div class="photo-slot__inner"><i class="bi bi-camera"></i><span>Cover photo</span></div></div>
+          <div class="photo-slot"><div class="photo-slot__inner"><i class="bi bi-camera"></i><span>Photo</span></div></div>
+          <div class="photo-slot"><div class="photo-slot__inner"><i class="bi bi-camera"></i><span>Photo</span></div></div>
+        </div>
+        <p class="photos-note"><i class="bi bi-hourglass-split"></i> Photo uploads coming soon</p>
+      </section>
+
+      <!-- Description -->
+      <section class="d-card">
+        <h2 class="d-heading"><i class="bi bi-file-text"></i> Description</h2>
+        <p class="d-body-text">{{ c.description }}</p>
+      </section>
+
+      @if (c.features.length > 0) {
+        <section class="d-card">
+          <h2 class="d-heading"><i class="bi bi-check-all"></i> Features &amp; Amenities</h2>
+          <div class="features-grid">
+            @for (feat of c.features; track feat) {
+              <div class="feat-item">
+                <i class="bi bi-check-circle-fill feat-check"></i>
+                <span>{{ feat }}</span>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+    </main>
+
+    <aside class="detail-sidebar">
+
+      <!-- Seller Card -->
+      <div class="d-card seller-card">
+        <div class="sc-header">
+          <div class="sc-avatar">{{ getInitials(c.sellerName) }}</div>
+          <div>
+            <p class="sc-name">{{ c.sellerName }}</p>
+            <p class="sc-role">Private Seller</p>
+          </div>
+        </div>
+        <div class="sc-actions">
+          @if (c.sellerPhone) {
+            <a [href]="'tel:' + c.sellerPhone" class="cta-btn cta-btn--primary"><i class="bi bi-telephone-fill"></i> Call Seller</a>
+          }
+        </div>
+        <div class="sc-meta-row">
+          <div class="sc-meta-item">
+            <i class="bi bi-clock"></i>
+            <span>{{ c.listedDaysAgo === 0 ? 'Today' : c.listedDaysAgo === 1 ? 'Yesterday' : c.listedDaysAgo + ' days ago' }}</span>
+          </div>
+          <div class="sc-meta-item">
+            <i class="bi bi-eye"></i>
+            <span>{{ c.viewCount.toLocaleString() }} views</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Safety Tips -->
+      <div class="d-card">
+        <h3 class="d-heading"><i class="bi bi-shield-check"></i> Safety Tips</h3>
+        <ul class="safety-list">
+          @for (tip of safetyTips; track tip) {
+            <li><i class="bi bi-shield-check tip-icon"></i> {{ tip }}</li>
+          }
+        </ul>
+      </div>
+
+    </aside>
+  </div>
+
+</div>
+  }
+}

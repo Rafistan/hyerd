@@ -1,0 +1,262 @@
+<div class="dashboard-wrap">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-user">
+      <div class="user-avatar-lg">{{ profile()?.full_name?.charAt(0) ?? '?' }}</div>
+      <div class="user-info">
+        <div class="user-name">{{ profile()?.full_name ?? '—' }}</div>
+        <div class="user-since">Member since {{ memberSince() }}</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of sidebarItems; track item.label) {
+        <button
+          class="sidebar-nav-item"
+          [class.active]="activeTab() === item.tab"
+          (click)="activeTab.set(item.tab)"
+        >
+          <i [class]="item.icon"></i>
+          <span>{{ item.label }}</span>
+          @if (item.badge) {
+            <span class="sidebar-badge">{{ item.badge }}</span>
+          }
+        </button>
+      }
+    </nav>
+
+    <div class="sidebar-post-cta">
+      <a routerLink="/marketplace" class="btn-hy btn-hy-primary" style="width:100%;justify-content:center">
+        <i class="bi bi-plus-lg"></i> New Listing
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+
+    <!-- Header bar -->
+    <div class="dash-header">
+      <div>
+        <h1 class="dash-heading">
+          @switch (activeTab()) {
+            @case ('overview') {
+              Overview
+            }
+            @case ('listings') {
+              My Listings
+            }
+            @case ('saved') {
+              Saved
+            }
+            @case ('reviews') {
+              Reviews
+            }
+            @case ('settings') {
+              Settings
+            }
+          }
+        </h1>
+        <p class="dash-subheading">
+          Welcome back, <strong>{{ firstName() }}</strong> — here's what's happening
+        </p>
+      </div>
+      <div class="dash-header-actions">
+        <button class="btn-hy btn-hy-outline btn-hy-sm">
+          <i class="bi bi-bell"></i> Notifications
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    @if (activeTab() === 'overview' || activeTab() === 'listings') {
+      <div class="stats-row">
+        @for (stat of stats; track stat.label) {
+          <div class="stat-card" [style.--stat-color]="stat.color">
+            <div class="stat-icon-wrap">
+              <i [class]="stat.icon"></i>
+            </div>
+            <div class="stat-body">
+              <div class="stat-val">{{ stat.value }}</div>
+              <div class="stat-lbl">{{ stat.label }}</div>
+            </div>
+            <div class="stat-trend" [class.up]="stat.trend > 0">
+              <i [class]="stat.trend > 0 ? 'bi bi-arrow-up-right' : 'bi bi-arrow-down-right'"></i>
+              {{ Math.abs(stat.trend) }}%
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Overview Tab -->
+    @if (activeTab() === 'overview') {
+      <div class="dash-grid-2">
+
+        <!-- Recent Activity -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title">Recent Activity</h3>
+          </div>
+          <div class="activity-list">
+            @for (act of recentActivity; track act.text) {
+              <div class="activity-item">
+                <div class="activity-icon" [style.background]="act.iconColor + '18'" [style.color]="act.iconColor">
+                  <i [class]="act.icon"></i>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-text">{{ act.text }}</p>
+                  <span class="activity-time">{{ act.time }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title">Quick Actions</h3>
+          </div>
+          <div class="quick-actions">
+            @for (action of quickActions; track action.label) {
+              <a [routerLink]="action.route" class="quick-action">
+                <div class="qa-icon" [style.background]="action.color">
+                  <i [class]="action.icon"></i>
+                </div>
+                <span class="qa-label">{{ action.label }}</span>
+                <i class="bi bi-chevron-right qa-arrow"></i>
+              </a>
+            }
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- Listings Tab -->
+    @if (activeTab() === 'listings') {
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <h3 class="dash-card-title">My Listings</h3>
+          <div class="listings-header-actions">
+            <select class="filter-select">
+              <option>All Status</option>
+              <option>Active</option>
+              <option>Pending</option>
+              <option>Expired</option>
+            </select>
+            <a routerLink="/marketplace" class="btn-hy btn-hy-primary btn-hy-sm">
+              <i class="bi bi-plus"></i> New
+            </a>
+          </div>
+        </div>
+
+        <div class="listings-table">
+          <div class="table-head">
+            <span>Title</span>
+            <span>Category</span>
+            <span>Status</span>
+            <span>Views</span>
+            <span>Date</span>
+            <span>Actions</span>
+          </div>
+          @for (listing of listings; track listing.id) {
+            <div class="table-row">
+              <div class="col-title">
+                <a [routerLink]="listingRoute(listing)" class="listing-title-link">
+                  {{ listing.title }}
+                </a>
+              </div>
+              <div class="col-cat">
+                    <span class="cat-pill" [style.background]="listing.categoryColor + '18'"
+                          [style.color]="listing.categoryColor">
+                      {{ listing.category }}
+                    </span>
+              </div>
+              <div class="col-status">
+                    <span [class]="'status-pill status-' + listing.status.toLowerCase()">
+                      <span class="status-dot"></span>
+                      {{ listing.status }}
+                    </span>
+              </div>
+              <div class="col-views">
+                <i class="bi bi-eye"></i> {{ listing.views }}
+              </div>
+              <div class="col-date">{{ listing.date }}</div>
+              <div class="col-actions">
+                <button class="row-action-btn">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="row-action-btn row-action-danger">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Saved Tab -->
+    @if (activeTab() === 'saved') {
+      <div class="dash-empty">
+        <div class="empty-icon">
+          <i class="bi bi-bookmark-heart"></i>
+        </div>
+        <h3 class="empty-heading">No saved listings yet</h3>
+        <p class="empty-text">Browse the community and bookmark listings you love.</p>
+        <a routerLink="/directory" class="btn-hy btn-hy-primary">Browse Directory</a>
+      </div>
+    }
+
+    <!-- Reviews Tab -->
+    @if (activeTab() === 'reviews') {
+      <div class="dash-empty">
+        <div class="empty-icon">
+          <i class="bi bi-star"></i>
+        </div>
+        <h3 class="empty-heading">No reviews yet</h3>
+        <p class="empty-text">Reviews from your customers will appear here.</p>
+      </div>
+    }
+
+    <!-- Settings Tab -->
+    @if (activeTab() === 'settings') {
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <h3 class="dash-card-title">Account Settings</h3>
+        </div>
+        <div class="settings-form">
+          <div class="settings-field">
+            <label class="settings-label">Display Name</label>
+            <input type="text" [(ngModel)]="settingsFullName" class="settings-input"/>
+          </div>
+          <div class="settings-field">
+            <label class="settings-label">Email</label>
+            <input type="email" [value]="userEmail()" readonly class="settings-input"
+                   style="opacity:0.65;cursor:default"/>
+          </div>
+          <div class="settings-field">
+            <label class="settings-label">Location</label>
+            <input type="text" [(ngModel)]="settingsCity" class="settings-input" placeholder="e.g. Glendale, CA"/>
+          </div>
+          <div class="settings-field">
+            <label class="settings-label">Bio</label>
+            <textarea [(ngModel)]="settingsBio" class="settings-input settings-textarea"
+                      placeholder="Tell the community about yourself..."></textarea>
+          </div>
+          @if (settingsSaved) {
+            <p style="color:var(--hy-success);font-size:0.85rem;font-weight:600;margin:0">Changes saved!</p>
+          }
+          <button class="btn-hy btn-hy-primary" (click)="saveSettings()" [disabled]="savingSettings"
+                  style="align-self:flex-start">
+            {{ savingSettings ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+      </div>
+    }
+
+  </main>
+</div>

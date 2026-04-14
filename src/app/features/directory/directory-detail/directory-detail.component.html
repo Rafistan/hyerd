@@ -1,0 +1,187 @@
+@if (loading()) {
+  <div class="state-screen">
+    <div class="loading-ring"></div>
+    <p class="state-label">Loading business…</p>
+  </div>
+} @else if (error()) {
+  <div class="state-screen">
+    <i class="bi bi-building-slash state-icon"></i>
+    <p class="state-label">{{ error() }}</p>
+    <a routerLink="/directory" class="back-link"><i class="bi bi-arrow-left"></i> Back to Directory</a>
+  </div>
+} @else if (business()) {
+<div class="biz-page">
+
+  <!-- Breadcrumb -->
+  <nav class="biz-crumb">
+    <div class="biz-crumb__inner">
+      <a routerLink="/" class="crumb-link">Home</a>
+      <i class="bi bi-chevron-right crumb-sep"></i>
+      <a routerLink="/directory" class="crumb-link">Directory</a>
+      <i class="bi bi-chevron-right crumb-sep"></i>
+      <span class="crumb-current">{{ business()!.name }}</span>
+    </div>
+  </nav>
+
+  <!-- Hero photo placeholder -->
+  <div class="detail-hero-ph">
+    <i class="bi bi-image detail-hero-ph__icon"></i>
+    <p class="detail-hero-ph__text">Cover photo</p>
+  </div>
+  <div class="biz-title-bar">
+    <div class="biz-title-bar__inner">
+      <div class="biz-avatar">{{ getInitials(business()!.name) }}</div>
+      <div class="btb-copy">
+        <div class="btb-badges">
+          <span class="badge-cat">{{ business()!.category }}</span>
+          @if (business()!.verified) {
+            <span class="badge-verified"><i class="bi bi-patch-check-fill"></i> Verified</span>
+          }
+        </div>
+        <h1 class="btb-name">{{ business()!.name }}</h1>
+        @if (business()!.rating > 0) {
+          <div class="btb-rating">
+            <div class="star-row">
+              @for (i of [1,2,3,4,5]; track i) {
+                <i class="bi" [class.bi-star-fill]="i <= Math.ceil(business()!.rating)" [class.bi-star]="i > Math.ceil(business()!.rating)"></i>
+              }
+            </div>
+            <span class="rating-val">{{ business()!.rating.toFixed(1) }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick info strip -->
+  <div class="info-strip">
+    <div class="info-strip__inner">
+      @if (business()!.address) {
+        <div class="info-chip">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span>{{ business()!.address }}</span>
+        </div>
+      }
+      @if (business()!.phone) {
+        <a [href]="'tel:' + business()!.phone" class="info-chip info-chip--link">
+          <i class="bi bi-telephone-fill"></i>
+          <span>{{ business()!.phone }}</span>
+        </a>
+      }
+      @if (business()!.email) {
+        <a [href]="'mailto:' + business()!.email" class="info-chip info-chip--link">
+          <i class="bi bi-envelope-fill"></i>
+          <span>{{ business()!.email }}</span>
+        </a>
+      }
+      @if (business()!.website) {
+        <a [href]="business()!.website" target="_blank" rel="noopener" class="info-chip info-chip--link">
+          <i class="bi bi-globe2"></i>
+          <span>{{ business()!.website }}</span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <!-- Main layout -->
+  <div class="biz-layout">
+    <main class="biz-main">
+
+      <!-- Photos -->
+      <section class="biz-card">
+        <h2 class="card-heading"><i class="bi bi-images"></i> Photos</h2>
+        <div class="photos-grid">
+          <div class="photo-slot photo-slot--main">
+            <div class="photo-slot__inner">
+              <i class="bi bi-camera"></i>
+              <span>Cover photo</span>
+            </div>
+          </div>
+          <div class="photo-slot">
+            <div class="photo-slot__inner">
+              <i class="bi bi-camera"></i>
+              <span>Photo</span>
+            </div>
+          </div>
+          <div class="photo-slot">
+            <div class="photo-slot__inner">
+              <i class="bi bi-camera"></i>
+              <span>Photo</span>
+            </div>
+          </div>
+        </div>
+        <p class="photos-note"><i class="bi bi-hourglass-split"></i> Photo uploads coming soon</p>
+      </section>
+
+      <!-- About -->
+      <section class="biz-card">
+        <h2 class="card-heading"><i class="bi bi-building"></i> About</h2>
+        <p class="biz-about">{{ business()!.description }}</p>
+      </section>
+
+      <!-- Hours -->
+      @if (hoursArray.length > 0) {
+        <section class="biz-card">
+          <h2 class="card-heading"><i class="bi bi-clock"></i> Hours of Operation</h2>
+          <div class="hours-list">
+            @for (item of hoursArray; track item.day) {
+              <div class="hours-row" [class.is-today]="item.day === todayName">
+                <div class="hours-day-wrap">
+                  <span class="hours-day">{{ item.day }}</span>
+                  @if (item.day === todayName) {
+                    <span class="today-badge">Today</span>
+                  }
+                </div>
+                <div class="hours-dots-line"></div>
+                <span class="hours-time" [class.is-closed]="item.hours.toLowerCase() === 'closed'">
+                  {{ item.hours }}
+                </span>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+    </main>
+
+    <!-- Sidebar -->
+    <aside class="biz-sidebar">
+      <div class="contact-card">
+        <div class="contact-card__header">
+          <div class="contact-card__avatar">
+            {{ getInitials(business()!.name) }}
+          </div>
+          <div>
+            <p class="contact-card__name">{{ business()!.name }}</p>
+            <p class="contact-card__cat">{{ business()!.category }}</p>
+          </div>
+        </div>
+        <div class="contact-card__actions">
+          @if (business()!.phone) {
+            <a [href]="'tel:' + business()!.phone" class="cta-btn cta-btn--primary">
+              <i class="bi bi-telephone-fill"></i> Call Now
+            </a>
+          }
+          @if (business()!.email) {
+            <a [href]="'mailto:' + business()!.email" class="cta-btn cta-btn--outline">
+              <i class="bi bi-envelope-fill"></i> Send Email
+            </a>
+          }
+          @if (business()!.website) {
+            <a [href]="business()!.website" target="_blank" rel="noopener" class="cta-btn cta-btn--ghost">
+              <i class="bi bi-box-arrow-up-right"></i> Visit Website
+            </a>
+          }
+        </div>
+        @if (business()!.address) {
+          <div class="contact-card__address">
+            <i class="bi bi-geo-alt"></i>
+            <span>{{ business()!.address }}</span>
+          </div>
+        }
+      </div>
+    </aside>
+  </div>
+
+</div>
+}

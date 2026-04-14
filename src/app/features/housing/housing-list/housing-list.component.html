@@ -1,0 +1,130 @@
+<div class="housing-page">
+  <!-- Hero -->
+  <div class="housing-hero">
+    <div class="housing-hero__inner">
+      <span class="section-eyebrow">Housing</span>
+      <h1 class="housing-hero__title">Find Your<br/>New Home</h1>
+      <p class="housing-hero__sub">Discover apartments, homes, and rooms in the Armenian community.</p>
+    </div>
+  </div>
+
+  <div class="housing-container">
+    <!-- Filter Card -->
+    <div class="filter-card">
+      <div class="filter-row">
+        <div class="filter-field">
+          <i class="bi bi-geo-alt search-icon"></i>
+          <input
+            type="text"
+            class="filter-input"
+            placeholder="City or location…"
+            [(ngModel)]="filters.location"
+            (ngModelChange)="applyFilters()"
+          />
+        </div>
+        <div class="filter-divider"></div>
+        <div class="filter-field filter-select-field">
+          <i class="bi bi-house search-icon"></i>
+          <select class="filter-select" [(ngModel)]="filters.type" (ngModelChange)="applyFilters()">
+            <option value="">All Property Types</option>
+            <option value="Apartment">Apartment</option>
+            <option value="House">House</option>
+            <option value="Condo">Condo</option>
+            <option value="Room">Room</option>
+          </select>
+        </div>
+        <div class="filter-divider"></div>
+        <div class="filter-field filter-select-field">
+          <i class="bi bi-door-open search-icon"></i>
+          <select class="filter-select" [(ngModel)]="filters.bedrooms" (ngModelChange)="applyFilters()">
+            <option value="">Any Bedrooms</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-row filter-row--prices">
+        <div class="filter-field">
+          <i class="bi bi-currency-dollar search-icon"></i>
+          <input type="number" placeholder="Min price" class="filter-input"
+                 [(ngModel)]="filters.minPrice" (ngModelChange)="applyFilters()"/>
+        </div>
+        <div class="filter-divider"></div>
+        <div class="filter-field">
+          <i class="bi bi-currency-dollar search-icon"></i>
+          <input type="number" placeholder="Max price" class="filter-input"
+                 [(ngModel)]="filters.maxPrice" (ngModelChange)="applyFilters()"/>
+        </div>
+      </div>
+      <div class="filter-footer">
+        <span class="results-count"><strong>{{ filteredListings.length }}</strong> properties found</span>
+        <button class="btn-hy btn-hy-ghost btn-hy-sm" (click)="resetFilters()">
+          <i class="bi bi-x-circle"></i> Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- Listings Grid -->
+    <div class="listings-grid">
+      @for (listing of filteredListings; track listing.id) {
+        <article class="listing-card" [routerLink]="['/housing', listing.id]">
+          <!-- Image Placeholder -->
+          <div class="listing-image" [style.background]="getGradient(listing.id)">
+            <span class="image-placeholder">{{ listing.type }}</span>
+          </div>
+
+          <!-- Card Content -->
+          <div class="card-content">
+            <!-- Price & Type -->
+            <div class="price-header">
+              <h3 class="listing-price">{{ formatPrice(listing.price) }}</h3>
+              <span class="listing-type">{{ listing.type }}</span>
+            </div>
+
+            <!-- Title -->
+            <h2 class="listing-title">{{ listing.title }}</h2>
+
+            <!-- Location -->
+            <p class="listing-location">
+              <span class="location-icon">📍</span>
+              {{ listing.location }}
+            </p>
+
+            <!-- Property Stats -->
+            <div class="stats-pills">
+              <span class="stat-pill">{{ listing.bedrooms }} Bed</span>
+              <span class="stat-pill">{{ listing.bathrooms }} Bath</span>
+              <span class="stat-pill">{{ listing.sqft | number }} sqft</span>
+            </div>
+
+            <!-- Description -->
+            <p class="listing-description">{{ listing.description }}</p>
+
+            <!-- Amenities -->
+            <div class="amenities">
+              @for (amenity of listing.amenities; track amenity) {
+                <span class="amenity-tag">{{ amenity }}</span>
+              }
+            </div>
+
+            <!-- Posted Date & Button -->
+            <div class="card-footer">
+              <span class="posted-date">{{ listing.postedDate }}</span>
+              <button class="view-button">View Details</button>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+
+    <!-- No Results -->
+    @if (filteredListings.length === 0) {
+      <div class="no-results">
+        <i class="bi bi-house-slash no-results__icon"></i>
+        <p>No properties found matching your criteria.</p>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,145 @@
+@if (loading()) {
+  <div class="state-screen">
+    <div class="loading-ring"></div>
+    <p class="state-label">Loading item details…</p>
+  </div>
+} @else if (notFound()) {
+  <div class="state-screen">
+    <i class="bi bi-bag-x state-icon"></i>
+    <p class="state-label">Item not found.</p>
+    <a routerLink="/marketplace" class="back-link"><i class="bi bi-arrow-left"></i> Back to Marketplace</a>
+  </div>
+} @else if (item()) {
+  @if (item(); as m) {
+<div class="detail-page">
+
+  <nav class="detail-crumb">
+    <div class="detail-crumb__inner">
+      <a routerLink="/" class="crumb-link">Home</a>
+      <i class="bi bi-chevron-right crumb-sep"></i>
+      <a routerLink="/marketplace" class="crumb-link">Marketplace</a>
+      <i class="bi bi-chevron-right crumb-sep"></i>
+      <span class="crumb-cur">{{ m.title }}</span>
+    </div>
+  </nav>
+
+  <!-- Hero photo placeholder -->
+  <div class="detail-hero-ph">
+    <i class="bi bi-image detail-hero-ph__icon"></i>
+    <p class="detail-hero-ph__text">Cover photo</p>
+  </div>
+  <div class="detail-title-bar">
+    <div class="detail-title-bar__inner">
+      <div class="dtb-left">
+        <div class="dtb-badges">
+          <span class="badge-cat">{{ m.category }}</span>
+          @if (m.condition) { <span class="badge-cond">{{ m.condition }}</span> }
+        </div>
+        <h1 class="dtb-title">{{ m.title }}</h1>
+        <div class="dtb-loc"><i class="bi bi-geo-alt-fill"></i> {{ m.location }}</div>
+      </div>
+      <div class="dtb-right">
+        <span class="dtb-price">{{ formatPrice(m.price) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info chips -->
+  <div class="mp-info-strip">
+    <div class="mp-info-strip__inner">
+      @if (m.condition) {
+        <span class="info-chip"><i class="bi bi-star-half"></i> {{ m.condition }}</span>
+      }
+      @if (m.brand) {
+        <span class="info-chip"><i class="bi bi-tag-fill"></i> {{ m.brand }}</span>
+      }
+      <span class="info-chip"><i class="bi bi-grid-fill"></i> {{ m.category }}</span>
+      <span class="info-chip"><i class="bi bi-geo-alt-fill"></i> {{ m.location }}</span>
+      <span class="info-chip"><i class="bi bi-clock"></i>
+        {{ m.postedDaysAgo === 0 ? 'Today' : m.postedDaysAgo + ' days ago' }}
+      </span>
+    </div>
+  </div>
+
+  <div class="detail-layout">
+    <main class="detail-main">
+
+      <!-- Photos -->
+      <section class="d-card">
+        <h2 class="d-heading"><i class="bi bi-images"></i> Photos</h2>
+        <div class="photo-grid">
+          <div class="photo-slot photo-slot--main"><div class="photo-slot__inner"><i class="bi bi-camera"></i><span>Cover photo</span></div></div>
+          <div class="photo-slot"><div class="photo-slot__inner"><i class="bi bi-camera"></i><span>Photo</span></div></div>
+          <div class="photo-slot"><div class="photo-slot__inner"><i class="bi bi-camera"></i><span>Photo</span></div></div>
+        </div>
+        <p class="photos-note"><i class="bi bi-hourglass-split"></i> Photo uploads coming soon</p>
+      </section>
+
+      <!-- Description -->
+      <section class="d-card">
+        <h2 class="d-heading"><i class="bi bi-file-text"></i> Description</h2>
+        <p class="d-body-text">{{ m.description }}</p>
+      </section>
+
+      @if (m.tags.length > 0) {
+        <section class="d-card">
+          <h2 class="d-heading"><i class="bi bi-tags-fill"></i> Tags</h2>
+          <div class="tags-row">
+            @for (tag of m.tags; track tag) {
+              <span class="tag-pill">{{ tag }}</span>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- Safety Tips -->
+      <section class="d-card">
+        <h2 class="d-heading"><i class="bi bi-shield-check"></i> Safety Tips</h2>
+        <ul class="safety-list">
+          <li><i class="bi bi-shield-check tip-icon"></i> Meet in a public place</li>
+          <li><i class="bi bi-shield-check tip-icon"></i> Inspect the item before buying</li>
+          <li><i class="bi bi-shield-check tip-icon"></i> Pay only after inspection</li>
+          <li><i class="bi bi-shield-check tip-icon"></i> Report suspicious activity</li>
+        </ul>
+      </section>
+
+    </main>
+
+    <aside class="detail-sidebar">
+
+      <!-- Price card -->
+      <div class="d-card price-highlight-card">
+        <div class="price-display">{{ formatPrice(m.price) }}</div>
+        @if (m.condition) {
+          <div class="price-cond">{{ m.condition }}</div>
+        }
+      </div>
+
+      <!-- Seller Card -->
+      <div class="d-card seller-card">
+        <div class="sc-header">
+          <div class="sc-avatar">{{ getInitials(m.contactName) }}</div>
+          <div>
+            <p class="sc-name">{{ m.contactName }}</p>
+            <p class="sc-role">Private Seller</p>
+          </div>
+        </div>
+        <div class="sc-actions">
+          @if (m.contactPhone) {
+            <a [href]="'tel:' + m.contactPhone" class="cta-btn cta-btn--primary"><i class="bi bi-telephone-fill"></i> Call Now</a>
+          }
+          @if (m.contactEmail) {
+            <a [href]="'mailto:' + m.contactEmail" class="cta-btn cta-btn--outline"><i class="bi bi-envelope-fill"></i> Send Email</a>
+          }
+        </div>
+        <div class="sc-meta"><i class="bi bi-clock"></i>
+          Listed {{ m.postedDaysAgo === 0 ? 'today' : m.postedDaysAgo + ' days ago' }}
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+</div>
+  }
+}

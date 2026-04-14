@@ -1,0 +1,162 @@
+@if (loading()) {
+  <div class="state-screen">
+    <div class="loading-ring"></div>
+    <p class="state-label">Loading event details…</p>
+  </div>
+} @else if (notFound()) {
+  <div class="state-screen">
+    <i class="bi bi-calendar-x state-icon"></i>
+    <p class="state-label">Event not found.</p>
+    <a routerLink="/events" class="back-link"><i class="bi bi-arrow-left"></i> Back to Events</a>
+  </div>
+} @else if (event()) {
+  @if (event(); as e) {
+<div class="detail-page">
+
+  <nav class="detail-crumb">
+    <div class="detail-crumb__inner">
+      <a routerLink="/" class="crumb-link">Home</a>
+      <i class="bi bi-chevron-right crumb-sep"></i>
+      <a routerLink="/events" class="crumb-link">Events</a>
+      <i class="bi bi-chevron-right crumb-sep"></i>
+      <span class="crumb-cur">{{ e.title }}</span>
+    </div>
+  </nav>
+
+  <!-- Hero photo placeholder -->
+  <div class="detail-hero-ph">
+    <i class="bi bi-image detail-hero-ph__icon"></i>
+    <p class="detail-hero-ph__text">Cover photo</p>
+  </div>
+  <div class="detail-title-bar">
+    <div class="detail-title-bar__inner">
+      <div class="dtb-left">
+        <span class="badge-cat">{{ e.category }}</span>
+        <h1 class="dtb-title">{{ e.title }}</h1>
+        <div class="dtb-chips">
+          <span class="dtb-chip"><i class="bi bi-calendar3"></i> {{ formatDate(e.date) }}</span>
+          @if (e.time) { <span class="dtb-chip"><i class="bi bi-clock"></i> {{ e.time }}</span> }
+        </div>
+      </div>
+      <div class="dtb-right">
+        @if (e.price === 0 || e.price === null) {
+          <span class="dtb-price dtb-price--free">Free</span>
+        } @else {
+          <span class="dtb-price">${{ e.price }}</span>
+        }
+        @if (e.priceLabel) { <span class="dtb-price-sub">{{ e.priceLabel }}</span> }
+      </div>
+    </div>
+  </div>
+
+  <!-- Info strip -->
+  <div class="ev-info-strip">
+    <div class="ev-info-strip__inner">
+      <div class="info-pill"><i class="bi bi-calendar-check-fill"></i><span>{{ formatDate(e.date) }}</span></div>
+      <div class="info-pill"><i class="bi bi-clock-fill"></i><span>{{ e.time }}</span></div>
+      <div class="info-pill"><i class="bi bi-building"></i><span>{{ e.venue }}</span></div>
+      <div class="info-pill"><i class="bi bi-geo-alt-fill"></i><span>{{ e.address }}</span></div>
+      @if (e.price === 0 || e.price === null) {
+        <div class="info-pill info-pill--free"><i class="bi bi-ticket-fill"></i><span>Free Entry</span></div>
+      } @else {
+        <div class="info-pill info-pill--paid"><i class="bi bi-ticket-fill"></i><span>${{ e.price }} / person</span></div>
+      }
+    </div>
+  </div>
+
+  <div class="detail-layout">
+    <main class="detail-main">
+
+      <!-- Photos -->
+      <section class="d-card">
+        <h2 class="d-heading"><i class="bi bi-images"></i> Photos</h2>
+        <div class="photo-grid">
+          <div class="photo-slot photo-slot--main"><div class="photo-slot__inner"><i class="bi bi-camera"></i><span>Cover photo</span></div></div>
+          <div class="photo-slot"><div class="photo-slot__inner"><i class="bi bi-camera"></i><span>Photo</span></div></div>
+          <div class="photo-slot"><div class="photo-slot__inner"><i class="bi bi-camera"></i><span>Photo</span></div></div>
+        </div>
+        <p class="photos-note"><i class="bi bi-hourglass-split"></i> Photo uploads coming soon</p>
+      </section>
+
+      <!-- About -->
+      <section class="d-card">
+        <h2 class="d-heading"><i class="bi bi-star"></i> About This Event</h2>
+        <p class="d-body-text">{{ e.description }}</p>
+      </section>
+
+      @if (e.capacity > 0) {
+        <section class="d-card">
+          <h2 class="d-heading"><i class="bi bi-people-fill"></i> Capacity</h2>
+          <div class="capacity-row">
+            <i class="bi bi-person-check-fill capacity-icon"></i>
+            <div>
+              <span class="capacity-count">{{ e.capacity }}</span>
+              <span class="capacity-label"> spots available</span>
+            </div>
+          </div>
+        </section>
+      }
+
+      @if (e.tags.length > 0) {
+        <section class="d-card">
+          <h2 class="d-heading"><i class="bi bi-tags-fill"></i> Tags</h2>
+          <div class="tags-row">
+            @for (tag of e.tags; track tag) {
+              <span class="tag-pill">{{ tag }}</span>
+            }
+          </div>
+        </section>
+      }
+
+    </main>
+
+    <aside class="detail-sidebar">
+
+      <!-- CTA Card -->
+      <div class="d-card cta-card">
+        <div class="cta-price-display">
+          @if (e.price === 0 || e.price === null) {
+            <span class="cta-free">Free Event</span>
+          } @else {
+            <span class="cta-amount">${{ e.price }}</span>
+            <span class="cta-per">{{ e.priceLabel }}</span>
+          }
+        </div>
+        @if (e.contactEmail) {
+          <a [href]="'mailto:' + e.contactEmail + '?subject=Registration: ' + e.title" class="cta-btn cta-btn--primary">
+            <i class="bi bi-ticket-fill"></i>
+            @if (e.price === 0 || e.price === null) { Register Now } @else { Get Tickets }
+          </a>
+        }
+        <div class="cta-meta"><i class="bi bi-calendar"></i> {{ formatDate(e.date) }} · {{ e.time }}</div>
+      </div>
+
+      <!-- Organizer -->
+      <div class="d-card">
+        <h3 class="d-heading"><i class="bi bi-person-badge-fill"></i> Organizer</h3>
+        <div class="sc-header">
+          <div class="sc-avatar">{{ getInitials(e.contactName) }}</div>
+          <div>
+            <p class="sc-name">{{ e.contactName }}</p>
+            <p class="sc-role">Event Organizer</p>
+          </div>
+        </div>
+        <div class="sc-actions">
+          @if (e.contactPhone) {
+            <a [href]="'tel:' + e.contactPhone" class="cta-btn cta-btn--primary"><i class="bi bi-telephone-fill"></i> Call Now</a>
+          }
+          @if (e.contactEmail) {
+            <a [href]="'mailto:' + e.contactEmail" class="cta-btn cta-btn--outline"><i class="bi bi-envelope-fill"></i> Send Email</a>
+          }
+        </div>
+        <div class="sc-meta"><i class="bi bi-clock"></i>
+          Posted {{ e.postedDaysAgo === 0 ? 'today' : e.postedDaysAgo + ' days ago' }}
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+</div>
+  }
+}

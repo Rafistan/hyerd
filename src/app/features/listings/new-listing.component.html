@@ -1,0 +1,304 @@
+<div class="new-listing-page">
+  <div class="nlp-header">
+    <div class="nlp-header-inner">
+      <a routerLink="/dashboard" class="back-link">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+      </a>
+      <h1 class="nlp-title">Post an Ad</h1>
+      <p class="nlp-sub">Fill in the details below to publish your listing on Hyerd.</p>
+    </div>
+  </div>
+
+  <div class="nlp-body">
+
+    <!-- Step indicator -->
+    <div class="steps-bar">
+      @for (s of steps; track s.num) {
+        <div class="step-item" [class.active]="currentStep() === s.num" [class.done]="currentStep() > s.num">
+          <div class="step-circle">
+            @if (currentStep() > s.num) {
+              <i class="bi bi-check-lg"></i>
+            } @else {
+              {{ s.num }}
+            }
+          </div>
+          <span class="step-label">{{ s.label }}</span>
+        </div>
+        @if (s.num < steps.length) {
+          <div class="step-connector" [class.done]="currentStep() > s.num"></div>
+        }
+      }
+    </div>
+
+    <div class="nlp-card">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <!-- Step 1: Choose listing type -->
+        @if (currentStep() === 1) {
+          <div class="step-section">
+            <h2 class="step-heading">What type of listing is this?</h2>
+            @if (loadingTypes()) {
+              <div class="loading-state">
+                <span class="spin"></span> Loading categories…
+              </div>
+            } @else {
+              <div class="type-grid">
+                @for (lt of listingTypes(); track lt.id) {
+                  <button
+                    type="button"
+                    class="type-card"
+                    [class.selected]="form.value.listing_type_id === lt.id"
+                    (click)="selectListingType(lt)"
+                  >
+                    <i [class]="'bi ' + (lt.icon ?? 'bi-tag') + ' type-icon'"></i>
+                    <span class="type-label">{{ lt.label }}</span>
+                    @if (lt.description) {
+                      <span class="type-desc">{{ lt.description }}</span>
+                    }
+                  </button>
+                }
+              </div>
+              @if (form.get('listing_type_id')?.invalid && form.get('listing_type_id')?.touched) {
+                <span class="field-error">Please select a listing type.</span>
+              }
+            }
+          </div>
+        }
+
+        <!-- Step 2: Choose subcategory + basic fields -->
+        @if (currentStep() === 2) {
+          <div class="step-section">
+            <h2 class="step-heading">Category & Details</h2>
+
+            @if (categories().length > 0) {
+              <div class="field-group">
+                <label class="field-label">Subcategory</label>
+                <select formControlName="category_id" class="field-select">
+                  <option value="">No specific subcategory</option>
+                  @for (cat of categories(); track cat.id) {
+                    <option [value]="cat.id">{{ cat.label }}</option>
+                  }
+                </select>
+              </div>
+            }
+
+            <div class="field-group">
+              <label class="field-label">Title <span class="req">*</span></label>
+              <input formControlName="title" type="text" class="field-input"
+                     placeholder="E.g. Senior Software Engineer at ArmTech"/>
+              @if (showError('title')) {
+                <span class="field-error">Title is required (min 3 characters).</span>
+              }
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Description <span class="req">*</span></label>
+              <textarea formControlName="description" class="field-textarea" rows="5"
+                        placeholder="Describe your listing in detail…"></textarea>
+              @if (showError('description')) {
+                <span class="field-error">Description is required (min 10 characters).</span>
+              }
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">City / Location <span class="req">*</span></label>
+              <input formControlName="city" type="text" class="field-input" placeholder="Glendale, CA"/>
+              @if (showError('city')) {
+                <span class="field-error">City is required.</span>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Step 3: Contact + price -->
+        @if (currentStep() === 3) {
+          <div class="step-section">
+            <h2 class="step-heading">Contact & Pricing</h2>
+
+            <div class="fields-row">
+              <div class="field-group">
+                <label class="field-label">Contact Email <span class="req">*</span></label>
+                <input formControlName="contact_email" type="email" class="field-input" placeholder="you@example.com"/>
+                @if (showError('contact_email')) {
+                  <span class="field-error">Valid email required.</span>
+                }
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Contact Phone <span class="req">*</span></label>
+                <input formControlName="contact_phone" type="tel" class="field-input" placeholder="(818) 555-0100"/>
+                @if (showError('contact_phone')) {
+                  <span class="field-error">Phone number is required.</span>
+                }
+              </div>
+            </div>
+
+            <div class="fields-row">
+              <div class="field-group">
+                <label class="field-label">Listing Price (optional)</label>
+                <input formControlName="listing_price" type="number" min="0" class="field-input" placeholder="0.00"/>
+                <span class="field-hint">Leave blank to display "Contact for price"</span>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Price Label (optional)</label>
+                <input formControlName="listing_price_label" type="text" class="field-input"
+                       placeholder="per month, /hr, negotiable…"/>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Tags (comma-separated, optional)</label>
+              <input formControlName="tags_input" type="text" class="field-input"
+                     placeholder="bilingual, remote, pet-friendly…"/>
+            </div>
+          </div>
+        }
+
+        <!-- Step 4: Type-specific metadata -->
+        @if (currentStep() === 4) {
+          <div class="step-section">
+            <h2 class="step-heading">Additional Details</h2>
+            @if (metaFields().length === 0) {
+              <p class="no-meta">No additional details required for this listing type.</p>
+            } @else {
+              @if (selectedType()?.slug === 'businesses') {
+                <!-- Address & Website -->
+                <div class="field-group">
+                  <label class="field-label">Street Address</label>
+                  <input formControlName="meta_address" type="text" class="field-input"
+                         placeholder="123 Main St, Glendale, CA 91205"/>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Website (optional)</label>
+                  <input formControlName="meta_website" type="text" class="field-input"
+                         placeholder="www.yourbusiness.com"/>
+                </div>
+                <!-- Hours -->
+                <div class="hours-heading">
+                  <i class="bi bi-clock"></i> Hours of Operation
+                </div>
+                <div class="hours-grid-form">
+                  @for (field of hoursFields(); track field.key) {
+                    <div class="field-group">
+                      <label class="field-label">{{ field.label }}</label>
+                      <input
+                        [formControlName]="'meta_' + field.key"
+                        type="text"
+                        class="field-input"
+                        [placeholder]="field.placeholder ?? 'Closed'"
+                      />
+                    </div>
+                  }
+                </div>
+              } @else {
+                @for (field of metaFields(); track field.key) {
+                  <div class="field-group">
+                    <label class="field-label">
+                      {{ field.label }}
+                      @if (field.required) {
+                        <span class="req">*</span>
+                      }
+                    </label>
+                    @if (field.type === 'select') {
+                      <select [formControlName]="'meta_' + field.key" class="field-select">
+                        <option value="">Select…</option>
+                        @if (field.key === 'employment_type') {
+                          <option value="Full-time">Full-time</option>
+                          <option value="Part-time">Part-time</option>
+                          <option value="Contract">Contract</option>
+                          <option value="Remote">Remote</option>
+                          <option value="Internship">Internship</option>
+                        }
+                        @if (field.key === 'condition') {
+                          <option value="New">New</option>
+                          <option value="Like New">Like New</option>
+                          <option value="Good">Good</option>
+                          <option value="Used">Used</option>
+                        }
+                        @if (field.key === 'transmission') {
+                          <option value="Automatic">Automatic</option>
+                          <option value="Manual">Manual</option>
+                          <option value="CVT">CVT</option>
+                        }
+                        @if (field.key === 'fuel') {
+                          <option value="Gasoline">Gasoline</option>
+                          <option value="Diesel">Diesel</option>
+                          <option value="Electric">Electric</option>
+                          <option value="Hybrid">Hybrid</option>
+                        }
+                        @if (field.key === 'furnished') {
+                          <option value="Furnished">Furnished</option>
+                          <option value="Partially Furnished">Partially Furnished</option>
+                          <option value="Unfurnished">Unfurnished</option>
+                        }
+                        @if (field.key === 'parking') {
+                          <option value="Included">Included</option>
+                          <option value="Street Parking">Street Parking</option>
+                          <option value="Garage">Garage</option>
+                          <option value="None">None</option>
+                        }
+                        @if (field.key === 'pets_allowed') {
+                          <option value="Yes">Yes</option>
+                          <option value="Cats Only">Cats Only</option>
+                          <option value="Small Dogs Only">Small Dogs Only</option>
+                          <option value="No">No</option>
+                        }
+                        @if (field.key === 'utilities_included') {
+                          <option value="All Included">All Included</option>
+                          <option value="Water & Trash">Water & Trash</option>
+                          <option value="None">None</option>
+                        }
+                      </select>
+                    } @else {
+                      <input
+                        [formControlName]="'meta_' + field.key"
+                        [type]="field.type"
+                        class="field-input"
+                        [placeholder]="field.placeholder ?? field.label"
+                      />
+                    }
+                  </div>
+                }
+              }
+            }
+          </div>
+        }
+
+        <!-- Submit error -->
+        @if (submitError()) {
+          <div class="form-error-banner">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            {{ submitError() }}
+          </div>
+        }
+
+        <!-- Navigation buttons -->
+        <div class="step-nav">
+          @if (currentStep() > 1) {
+            <button type="button" class="btn-hy btn-hy-outline" (click)="prevStep()">
+              <i class="bi bi-arrow-left"></i> Back
+            </button>
+          } @else {
+            <span></span>
+          }
+
+          @if (currentStep() < totalSteps) {
+            <button type="button" class="btn-hy btn-hy-primary" (click)="nextStep()">
+              Continue <i class="bi bi-arrow-right"></i>
+            </button>
+          } @else {
+            <button type="submit" class="btn-hy btn-hy-primary" [disabled]="loading()">
+              @if (loading()) {
+                <span class="spin"></span> Publishing…
+              } @else {
+                Publish Listing <i class="bi bi-check-lg"></i>
+              }
+            </button>
+          }
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

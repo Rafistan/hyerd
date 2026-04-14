@@ -1,0 +1,146 @@
+<div class="cars-page">
+
+  <!-- Hero -->
+  <div class="cars-hero">
+    <div class="cars-hero__inner">
+      <span class="section-eyebrow">Vehicle Marketplace</span>
+      <h1 class="cars-hero__title">Buy &amp; Sell Cars</h1>
+      <p class="cars-hero__sub">Quality vehicles from trusted sellers in the Armenian community.</p>
+    </div>
+  </div>
+
+  <div class="cars-container">
+
+    <!-- Filter Bar -->
+    <div class="filter-card">
+      <!-- Row 1: text inputs -->
+      <div class="filter-row">
+        <div class="filter-field">
+          <label class="filter-label">Make</label>
+          <input
+            type="text"
+            placeholder="e.g. BMW, Toyota…"
+            [(ngModel)]="filters.make"
+            (ngModelChange)="applyFilters()"
+            class="filter-input"
+          />
+        </div>
+        <div class="filter-field">
+          <label class="filter-label">Model</label>
+          <input
+            type="text"
+            placeholder="e.g. X5, Camry…"
+            [(ngModel)]="filters.model"
+            (ngModelChange)="applyFilters()"
+            class="filter-input"
+          />
+        </div>
+        <div class="filter-field">
+          <label class="filter-label">Condition</label>
+          <select [(ngModel)]="filters.condition" (ngModelChange)="applyFilters()" class="filter-select">
+            <option value="">All Conditions</option>
+            <option value="New">New</option>
+            <option value="Used">Used</option>
+            <option value="Certified Pre-Owned">Certified Pre-Owned</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Row 2: range inputs -->
+      <div class="filter-row">
+        <div class="filter-field">
+          <label class="filter-label">Year Range</label>
+          <div class="double-select">
+            <select [(ngModel)]="filters.yearMin" (ngModelChange)="applyFilters()" class="filter-select">
+              <option value="">Min Year</option>
+              @for (year of yearRange; track year) {
+                <option [value]="year">{{ year }}</option>
+              }
+            </select>
+            <select [(ngModel)]="filters.yearMax" (ngModelChange)="applyFilters()" class="filter-select">
+              <option value="">Max Year</option>
+              @for (year of yearRange; track year) {
+                <option [value]="year">{{ year }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="filter-field">
+          <label class="filter-label">Price Range</label>
+          <div class="double-input">
+            <input type="number" placeholder="Min $" [(ngModel)]="filters.priceMin" (ngModelChange)="applyFilters()" class="filter-input" />
+            <input type="number" placeholder="Max $" [(ngModel)]="filters.priceMax" (ngModelChange)="applyFilters()" class="filter-input" />
+          </div>
+        </div>
+      </div>
+      <div class="filter-footer">
+        <span class="results-count"><strong>{{ filteredCars().length }}</strong> vehicles found</span>
+        <button class="btn-hy btn-hy-ghost btn-hy-sm" (click)="resetFilters()">
+          <i class="bi bi-x-circle"></i> Reset Filters
+        </button>
+      </div>
+    </div>
+
+    <!-- Cars Grid -->
+    @if (loading()) {
+      <div class="loading-state">
+        <i class="bi bi-arrow-repeat loading-spin"></i>
+        Loading vehicles…
+      </div>
+    } @else if (filteredCars().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon"><i class="bi bi-car-front"></i></div>
+        <h3 class="empty-heading">No vehicles found</h3>
+        <p class="empty-text">Try adjusting your filters to discover more listings.</p>
+        <button class="btn-hy btn-hy-outline" (click)="resetFilters()">Clear Filters</button>
+      </div>
+    } @else {
+      <div class="cars-grid">
+        @for (car of filteredCars(); track car.id) {
+          <a [routerLink]="['/cars', car.id]" class="car-card">
+            <!-- Visual -->
+            <div class="car-card__image" [style.background]="car.gradient">
+              <span class="condition-pill condition-{{ car.condition.toLowerCase().replace(' ', '-') }}">
+                {{ car.condition }}
+              </span>
+              <div class="car-card__icon">
+                <i class="bi bi-car-front-fill"></i>
+              </div>
+            </div>
+
+            <!-- Body -->
+            <div class="car-card__body">
+              <div class="car-price">{{ formatPrice(car.price) }}</div>
+              <h3 class="car-title">{{ car.year }} {{ car.make }} {{ car.model }}</h3>
+
+              <div class="car-specs">
+                <span class="spec-item">
+                  <i class="bi bi-speedometer2"></i>
+                  {{ formatMileage(car.mileage) }} mi
+                </span>
+                <span class="spec-item">
+                  <i class="bi bi-geo-alt"></i>
+                  {{ car.location }}
+                </span>
+              </div>
+
+              <div class="car-features">
+                @for (feat of car.features.slice(0, 3); track feat) {
+                  <span class="feature-tag">{{ feat }}</span>
+                }
+              </div>
+
+              <div class="car-footer">
+                <span class="seller-name">
+                  <i class="bi bi-person"></i> {{ car.sellerName }}
+                </span>
+                <span class="view-link">View details <i class="bi bi-arrow-right"></i></span>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    }
+
+  </div>
+</div>

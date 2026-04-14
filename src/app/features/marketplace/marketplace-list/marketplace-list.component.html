@@ -1,0 +1,85 @@
+<div class="marketplace-container">
+  <!-- Header -->
+  <div class="marketplace-header">
+    <h1 class="marketplace-title">Marketplace</h1>
+    <p class="marketplace-subtitle">Buy and sell within the community</p>
+  </div>
+
+  <!-- Search and Filter Bar -->
+  <div class="search-filter-section">
+    <div class="search-bar">
+      <input
+        type="text"
+        placeholder="Search items..."
+        [(ngModel)]="searchQuery"
+        (input)="filterItems()"
+        class="search-input"
+      />
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+    </div>
+
+    <select
+      [(ngModel)]="sortBy"
+      (change)="sortItems()"
+      class="sort-dropdown"
+    >
+      <option value="newest">Newest</option>
+      <option value="price-low">Price: Low to High</option>
+      <option value="price-high">Price: High to Low</option>
+    </select>
+  </div>
+
+  <!-- Category Filter Tags -->
+  <div class="category-filters">
+    <button
+      *ngFor="let category of categories"
+      [class.active]="selectedCategory === category"
+      (click)="selectCategory(category)"
+      class="category-tag"
+    >
+      {{ category }}
+    </button>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="products-grid">
+    <div *ngFor="let item of filteredItems" class="product-card" [routerLink]="['/marketplace', item.id]">
+      <div class="card-image-wrapper">
+        <div class="card-image" [style.background]="getGradient()">
+              <span class="condition-badge" [class]="item.condition.toLowerCase()">
+                {{ item.condition }}
+              </span>
+        </div>
+      </div>
+
+      <div class="card-content">
+        <h3 class="card-title">{{ item.title }}</h3>
+
+        <p class="card-price">{{ item.price | currency }}</p>
+
+        <div class="card-meta">
+          <span class="meta-item">{{ item.seller }}</span>
+          <span class="meta-item">{{ item.postedDate }}</span>
+        </div>
+
+        <div class="card-location">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span>{{ item.location }}</span>
+        </div>
+
+        <button class="contact-seller-btn">Contact Seller</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredItems.length === 0" class="empty-state">
+    <p>No items found. Try adjusting your filters.</p>
+  </div>
+</div>

@@ -1,0 +1,313 @@
+<!-- ==============================
+     HERO SECTION
+============================== -->
+<section class="hero">
+  <!-- Animated background blobs -->
+  <div class="hero-bg" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="hero-grid-overlay"></div>
+  </div>
+
+  <div class="hero-inner container-hy">
+    <div class="hero-content">
+      <div class="hero-eyebrow" hyAnimate [hyDelay]="0">
+        <span class="eyebrow-dot"></span>
+        Serving 50,000+ Armenians worldwide
+      </div>
+
+      <h1 class="hero-heading" hyAnimate [hyDelay]="80">
+        Your Armenian<br/>
+        Community,<br/>
+        <em class="hero-heading-em">All In One Place.</em>
+      </h1>
+
+      <p class="hero-subheading" hyAnimate [hyDelay]="160">
+        Discover businesses, find jobs, housing, cars, events, and connect with
+        Armenians across the globe — right here on Hyerd.
+      </p>
+
+      <!-- Search Widget -->
+      <div class="hero-search" hyAnimate [hyDelay]="240">
+        <div class="search-tabs">
+          @for (tab of searchTabs; track tab; let i = $index) {
+            <button
+              class="search-tab"
+              [class.active]="activeSearchTab() === i"
+              (click)="activeSearchTab.set(i)"
+            >{{ tab }}
+            </button>
+          }
+        </div>
+        <div class="search-box">
+          <div class="search-loc">
+            <i class="bi bi-geo-alt"></i>
+            <input #locInput type="text" placeholder="City, ZIP, or Remote" class="search-loc-input"
+                   (keyup.enter)="onSearch(locInput.value, kwInput.value)"/>
+          </div>
+          <div class="search-divider"></div>
+          <div class="search-kw">
+            <i class="bi bi-search"></i>
+            <input #kwInput type="text" placeholder="What are you looking for?" class="search-kw-input"
+                   (keyup.enter)="onSearch(locInput.value, kwInput.value)"/>
+          </div>
+          <button class="search-go-btn" (click)="onSearch(locInput.value, kwInput.value)">
+            <i class="bi bi-search"></i>
+            Search
+          </button>
+        </div>
+        <div class="search-hot">
+          <span class="search-hot-label">Trending:</span>
+          @for (tag of hotSearches; track tag) {
+            <a [routerLink]="['/directory']" [queryParams]="{q: tag}" class="search-hot-tag">{{ tag }}</a>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Visual -->
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hero-card-stack">
+        <!-- Floating cards -->
+        <div class="float-card fc-top">
+          <div class="fc-avatar" style="background: linear-gradient(135deg, #B5261E, #D4822A)">A</div>
+          <div class="fc-info">
+            <div class="fc-name">Ararat Restaurant</div>
+            <div class="fc-meta">
+              <i class="bi bi-star-fill" style="color:#D4822A"></i> 4.9 · 324 reviews
+            </div>
+          </div>
+          <div class="fc-badge">Open</div>
+        </div>
+
+        <div class="hero-map-placeholder">
+          <div class="map-pulse">
+            <div class="map-pin">
+              <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <div class="pulse-ring r1"></div>
+            <div class="pulse-ring r2"></div>
+          </div>
+          <div class="map-label">Glendale, CA</div>
+        </div>
+
+        <div class="float-card fc-bottom">
+          <div class="fc-icon-wrap">
+            <i class="bi bi-briefcase-fill"></i>
+          </div>
+          <div class="fc-info">
+            <div class="fc-name">Sr. Engineer &#64; Arev Tech</div>
+            <div class="fc-meta">$130K–$160K · Full-time</div>
+          </div>
+        </div>
+
+        <div class="float-card fc-side">
+          <div class="fc-stat-row">
+            <div class="fc-stat">
+              <div class="fc-stat-val">12K+</div>
+              <div class="fc-stat-lbl">Businesses</div>
+            </div>
+            <div class="fc-stat-divider"></div>
+            <div class="fc-stat">
+              <div class="fc-stat-val">5K+</div>
+              <div class="fc-stat-lbl">Jobs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==============================
+     STATS TICKER
+============================== -->
+<div class="stats-ticker">
+  <div class="stats-ticker-inner container-hy">
+    @for (stat of stats; track stat.label) {
+      <div class="ticker-stat">
+        <span class="ticker-icon"><i [class]="stat.icon"></i></span>
+        <span class="ticker-value">{{ stat.value }}{{ stat.suffix }}</span>
+        <span class="ticker-label">{{ stat.label }}</span>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- ==============================
+     CATEGORY GRID
+============================== -->
+<section class="categories-section section-pad">
+  <div class="container-hy">
+    <div class="section-head" hyAnimate>
+      <span class="section-eyebrow">Explore Hyerd</span>
+      <h2 class="section-title">Everything your community needs</h2>
+      <p class="section-subtitle">Six categories, thousands of listings — all from the Armenian community.</p>
+    </div>
+
+    <div class="cat-grid">
+      @for (cat of categories; track cat.route; let i = $index) {
+        <a
+          [routerLink]="cat.route"
+          class="cat-card"
+          hyAnimate
+          [hyDelay]="i * 70"
+        >
+          <div class="cat-card-icon" [style.background]="cat.color">
+            <i [class]="cat.icon"></i>
+          </div>
+          <div class="cat-card-content">
+            <h3 class="cat-card-name">{{ cat.name }}</h3>
+            <p class="cat-card-desc">{{ cat.description }}</p>
+          </div>
+          <div class="cat-card-footer">
+            <span class="cat-card-count">{{ cat.count }} listings</span>
+            <span class="cat-card-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>
+          <div class="cat-card-accent" [style.background]="cat.color"></div>
+        </a>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ==============================
+     FEATURED BUSINESSES
+============================== -->
+<section class="featured-section section-pad">
+  <div class="container-hy">
+    <div class="featured-head">
+      <div hyAnimate>
+        <span class="section-eyebrow">Hand-picked</span>
+        <h2 class="section-title">Featured Businesses</h2>
+        <p class="section-subtitle">Trusted, verified Armenian-owned businesses in your area.</p>
+      </div>
+      <a routerLink="/directory" class="link-arrow" hyAnimate hyAnimate="left">
+        View All <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="biz-grid">
+      @for (biz of featuredBusinesses; track biz.id; let i = $index) {
+        <a [routerLink]="['/directory', biz.id]" class="biz-card" hyAnimate [hyDelay]="i * 90">
+          <div class="biz-image" [style.background]="biz.gradient">
+            <div class="biz-image-overlay"></div>
+            <span class="biz-initial" aria-hidden="true">{{ biz.initial }}</span>
+          </div>
+          <div class="biz-body">
+            <span class="biz-category">{{ biz.category }}</span>
+            <h4 class="biz-name">{{ biz.name }}</h4>
+            <div class="biz-location">
+              <i class="bi bi-geo-alt"></i> {{ biz.location }}
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ==============================
+     JOBS SNAPSHOT
+============================== -->
+<section class="jobs-section section-pad">
+  <div class="container-hy">
+    <div class="jobs-layout">
+      <!-- Left text -->
+      <div class="jobs-text" hyAnimate>
+        <span class="section-eyebrow">Career Opportunities</span>
+        <h2 class="section-title" style="max-width:380px">Find your next opportunity in the community</h2>
+        <p class="section-subtitle">Hundreds of roles posted by Armenian-owned businesses every week.</p>
+        <a routerLink="/jobs" class="btn-hy btn-hy-primary" style="margin-top:28px">
+          <i class="bi bi-briefcase"></i> Browse All Jobs
+        </a>
+      </div>
+
+      <!-- Right jobs list -->
+      <div class="jobs-list">
+        @for (job of recentJobs; track job.id; let i = $index) {
+          <a [routerLink]="['/jobs', job.id]" class="job-row" hyAnimate [hyDelay]="i * 80">
+            <div class="job-row-left">
+              <div class="job-company-icon">
+                {{ job.company.charAt(0) }}
+              </div>
+              <div class="job-info">
+                <h4 class="job-title">{{ job.title }}</h4>
+                <div class="job-meta">
+                  <span>{{ job.company }}</span>
+                  <span class="dot">·</span>
+                  <span><i class="bi bi-geo-alt"></i> {{ job.location }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="job-row-right">
+              <span class="job-type-pill" [style.background]="job.typeColor + '18'" [style.color]="job.typeColor">
+                {{ job.type }}
+              </span>
+              <span class="job-salary">{{ job.salary }}</span>
+            </div>
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==============================
+     SOCIAL PROOF / TESTIMONIALS
+============================== -->
+<section class="testimonials-section section-pad">
+  <div class="container-hy">
+    <div class="section-head" style="text-align:center; align-items:center" hyAnimate>
+      <span class="section-eyebrow">Community Stories</span>
+      <h2 class="section-title">Hear from our members</h2>
+    </div>
+
+    <div class="testimonials-grid">
+      @for (t of testimonials; track t.name; let i = $index) {
+        <blockquote class="testimonial-card" hyAnimate [hyDelay]="i * 100">
+          <div class="testimonial-quote-mark" aria-hidden="true">"</div>
+          <p class="testimonial-text">{{ t.quote }}</p>
+          <footer class="testimonial-footer">
+            <div class="testimonial-avatar" [style.background]="t.color">{{ t.initials }}</div>
+            <div>
+              <div class="testimonial-name">{{ t.name }}</div>
+              <div class="testimonial-role">{{ t.role }}</div>
+            </div>
+          </footer>
+        </blockquote>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ==============================
+     CTA BANNER
+============================== -->
+<section class="cta-section" hyAnimate>
+  <div class="container-hy">
+    <div class="cta-box">
+      <div class="cta-bg-pattern" aria-hidden="true"></div>
+      <div class="cta-content">
+        <div class="cta-badge">
+          <i class="bi bi-stars"></i> Free to join
+        </div>
+        <h2 class="cta-title">Join 50,000 Armenians already on Hyerd</h2>
+        <p class="cta-subtitle">
+          List your business, post a job, find housing — everything your community needs.
+        </p>
+        <div class="cta-actions">
+          <a routerLink="/register" class="btn-hy btn-hy-xl" style="background:#fff;color:var(--hy-midnight)">
+            Get Started Free
+          </a>
+          <a routerLink="/directory" class="btn-hy btn-hy-xl btn-hy-outline"
+             style="border-color:rgba(255,255,255,0.4);color:#fff">
+            Explore Community
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
